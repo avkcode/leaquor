@@ -29,7 +29,7 @@ Using Custom Patterns
 ```
 julia leaquor.jl --patterns patterns.yaml --dir ./my_project
 ```
-`patterns.yaml` - shamelessly stolen from https://github.com/mazen160/secrets-patterns-db
+`patterns.yaml` - shamelessly stolen from [secrets-patterns-db](https://github.com/mazen160/secrets-patterns-db)
 
 Generating JSON Output
 ```
