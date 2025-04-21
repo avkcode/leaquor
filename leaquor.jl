@@ -187,7 +187,7 @@ function print_results(secrets, json_output=false, output_file=nothing)
         if json_output
             json_data = "[]"
         else
-            println("No secrets found!")
+            println(stderr, "No secrets found!")
             return
         end
     else
@@ -208,33 +208,33 @@ function print_results(secrets, json_output=false, output_file=nothing)
                 open(output_file, "w") do io
                     JSON.print(io, json_data, 4)  # Pretty-print with 4 spaces indentation
                 end
-                println("JSON results written to $output_file")
+                println(stderr, "JSON results written to $output_file")
             catch e
                 @error "Failed to write JSON output to file: $e"
-                println("Fallback: Printing JSON to stdout")
                 JSON.print(stdout, json_data, 4)
             end
         else
-            JSON.print(stdout, json_data, 4)  # Print JSON to stdout
+            # This is the only line that should go to stdout when using --json
+            JSON.print(stdout, json_data, 4)
         end
     else
-        # Print results in plain text
-        println("\nFound $(length(secrets)) potential secrets:")
-        println("="^60)
+        # Plain text output goes to stderr to avoid mixing with JSON
+        println(stderr, "\nFound $(length(secrets)) potential secrets:")
+        println(stderr, "="^60)
         
         for secret in secrets
-            println("\nFile: $(secret.filepath)")
-            println("Line: $(secret.line)")
-            println("Type: $(secret.pattern)")
-            println("Match: $(secret.match)")
-            println("Context: $(secret.context)")
-            println("-"^60)
+            println(stderr, "\nFile: $(secret.filepath)")
+            println(stderr, "Line: $(secret.line)")
+            println(stderr, "Type: $(secret.pattern)")
+            println(stderr, "Match: $(secret.match)")
+            println(stderr, "Context: $(secret.context)")
+            println(stderr, "-"^60)
         end
     end
 end
 
 function print_help()
-    println("""
+    println(stderr, """
 Usage: julia leaquor.jl [options]
 
 Options:
@@ -251,16 +251,16 @@ Arguments:
 
 Examples:
   julia leaquor.jl --repo https://github.com/user/repo.git --json --output-file out.json
-  julia leaquor.jl --dir ./my_project --patterns custom_patterns.yaml
+  julia leaquor.jl --dir ./my_project --patterns custom_patterns.yaml | jq .
 """)
 end
 
 function clone_github_repo(repo_url)
     temp_dir = mktempdir()
-    println("Cloning repository from $repo_url into $temp_dir...")
+    println(stderr, "Cloning repository from $repo_url into $temp_dir...")
     try
         LibGit2.clone(repo_url, temp_dir)
-        println("Repository cloned successfully.")
+        println(stderr, "Repository cloned successfully.")
     catch e
         @error "Failed to clone repository: $e"
         rm(temp_dir, recursive=true, force=true)
@@ -270,7 +270,8 @@ function clone_github_repo(repo_url)
 end
 
 function main()
-    println("Secrets Scanner in Julia")
+    # Print all status messages to stderr
+    println(stderr, "Secrets Scanner in Julia")
     
     # Parse command-line arguments
     args = ARGS
@@ -311,7 +312,7 @@ function main()
     
     # Validate that either --repo or --dir is provided
     if isnothing(repo_url) && isnothing(dir_path)
-        println("Error: Either --repo or --dir must be provided.")
+        println(stderr, "Error: Either --repo or --dir must be provided.")
         print_help()
         return
     end
@@ -330,20 +331,20 @@ function main()
     if !isnothing(repo_url)
         scan_dir = clone_github_repo(repo_url)
         if isnothing(scan_dir)
-            println("Aborting due to failure in cloning the repository.")
+            println(stderr, "Aborting due to failure in cloning the repository.")
             return
         end
     elseif !isnothing(dir_path)
         scan_dir = dir_path
     end
     
-    println("\nScanning $scan_dir for potential secrets...")
+    println(stderr, "\nScanning $scan_dir for potential secrets...")
     secrets = scan_directory(scan_dir, secret_patterns, ignore_files)
     print_results(secrets, json_output, output_file)
     
     # Clean up temporary directory if a repository was cloned
     if !isnothing(repo_url) && !isnothing(scan_dir)
-        println("Cleaning up temporary directory...")
+        println(stderr, "Cleaning up temporary directory...")
         rm(scan_dir, recursive=true, force=true)
     end
 end
