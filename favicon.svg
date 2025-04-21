@@ -1,0 +1,76 @@
+<svg width="288" height="336" viewBox="0 0 288 336" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gold gradient -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff8d8"/>
+      <stop offset="30%" stop-color="#f7e394"/>
+      <stop offset="50%" stop-color="#e6c35a"/>
+      <stop offset="70%" stop-color="#c59b3a"/>
+      <stop offset="100%" stop-color="#a67c00"/>
+    </linearGradient>
+
+    <!-- Background gradient with dotted pattern -->
+    <pattern id="dottedPattern" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
+      <circle cx="5" cy="5" r="1" fill="#5a3d6b" opacity="0.6"/>
+    </pattern>
+    
+    <radialGradient id="velvet" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#3b1f47"/>
+      <stop offset="50%" stop-color="#2a1233"/>
+      <stop offset="100%" stop-color="#1a0c1f"/>
+    </radialGradient>
+
+    <!-- Subtle Bevel Shine -->
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1" gradientTransform="rotate(45)">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.1"/>
+      <stop offset="40%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Drop shadow -->
+    <filter id="deepShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="6" dy="8" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+
+    <!-- Dodecahedron facet pattern (subtle) -->
+    <pattern id="facetPattern" patternUnits="userSpaceOnUse" width="20" height="20">
+      <path d="M0,0 L20,0 L10,20 Z" fill="#000000" opacity="0.03"/>
+      <path d="M20,0 L20,20 L10,10 Z" fill="#000000" opacity="0.03"/>
+    </pattern>
+  </defs>
+
+  <!-- Background with dotted pattern -->
+  <rect width="288" height="336" rx="40" ry="40" fill="url(#velvet)"/>
+  <rect width="288" height="336" rx="40" ry="40" fill="url(#dottedPattern)"/>
+  
+  <!-- Icon border with thin bevel -->
+  <rect width="288" height="336" rx="40" ry="40"
+        fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <rect x="0" y="0" width="288" height="336" rx="40" ry="40" fill="url(#shine)"/>
+
+  <!-- 3D Dodecahedron -->
+  <g transform="translate(144,168) scale(1.5)">
+    <!-- Shadow layers -->
+    <polygon points="0,-80 25,-20 75,-20 25,30 -25,30 -75,-20 -25,-20" 
+             fill="#1a0c1f" opacity="0.6" transform="translate(8,10)" />
+    <polygon points="0,-80 25,-20 75,-20 25,30 -25,30 -75,-20 -25,-20" 
+             fill="#3b1f47" opacity="0.9" transform="translate(4,5)" />
+    
+    <!-- Main dodecahedron -->
+    <polygon points="0,-80 25,-20 75,-20 25,30 -25,30 -75,-20 -25,-20" 
+             fill="url(#gold)" filter="url(#deepShadow)" />
+    
+    <!-- Transparent hole inside the dodecahedron -->
+    <circle cx="0" cy="0" r="40" fill="transparent" stroke="none" />
+    
+    <!-- Subtle facet texture -->
+    <polygon points="0,-80 25,-20 75,-20 25,30 -25,30 -75,-20 -25,-20" 
+             fill="url(#facetPattern)" opacity="0.60"/>
+    
+    <!-- Thin dark bevel lines -->
+    <path d="M0,-80 L25,-20 L75,-20 L25,30 L-25,30 L-75,-20 L-25,-20 Z" 
+          fill="none" stroke="#000000" stroke-opacity="0.5" stroke-width="0.5"/>
+  </g>
+</svg>
