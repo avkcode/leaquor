@@ -63,6 +63,11 @@ Run the Container
 ```bash
 docker run --rm -v $(pwd)/my_project:/app/my_project leaquor --dir /app/my_project
 ```
+## Test
+Clones leaky repo and runs tests
+```
+make test
+```
 
 ## License
 

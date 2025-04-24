@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy all required project files into the container
-COPY LICENSE README.md favicon.svg leaquor.jl patterns.yaml /app/
+COPY leaquor.jl patterns.yaml /app/
 
 # Install required Julia packages
 RUN julia -e 'using Pkg; \
