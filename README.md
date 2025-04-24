@@ -53,7 +53,7 @@ Run the Script
 ```
 julia leaquor.jl --help
 ```
-## Docker Support
+## Docker
 
 You can also run Leaquor in a Docker container for seamless deployment:
 ```bash
@@ -64,10 +64,8 @@ Run the Container
 docker run --rm -v $(pwd)/my_project:/app/my_project leaquor --dir /app/my_project
 ```
 
-Pull docker image
+## Docker image
 ```
-https://hub.docker.com/repository/docker/leaquor/leaquor/tags
-
 docker pull leaquor/leaquor:latest
 ```
 
@@ -75,6 +73,13 @@ docker pull leaquor/leaquor:latest
 Clones leaky repo and runs tests
 ```
 make test
+```
+
+## Package
+Run package target to generate .deb package
+```
+make package
+Dockerfile.package  leaquor.deb  LICENSE     nfpm.yaml  README.md
 ```
 
 ## License
