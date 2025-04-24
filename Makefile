@@ -1,6 +1,3 @@
-# Makefile for Leaquor Project
-
-# Variables
 PROJECT_NAME = leaquor
 DOCKER_IMAGE = $(PROJECT_NAME)-image
 DOCKER_CONTAINER = $(PROJECT_NAME)-container
@@ -17,19 +14,20 @@ JULIA_VERSION ?= v1.11.5  # Default Julia version to install
 # Default target
 all: help
 
-# Help target to display available commands
 help:
-	@echo "Usage: make <target>"
-	@echo ""
 	@echo "Available targets:"
-	@echo "  install        Install Julia dependencies"
-	@echo "  run            Run the script locally"
-	@echo "  docker-build   Build the Docker image"
-	@echo "  docker-run     Run the Docker container"
-	@echo "  docker-push    Push the Docker image to Docker Hub"
-	@echo "  test           Run tests using the test repository"
-	@echo "  clean          Remove temporary files and build artifacts"
-	@echo "  help           Display this help message"
+	@echo "  test             - Run unit tests"
+	@echo "  docker-build     - Build the Docker image"
+	@echo "  docker-run       - Run the Docker container"
+	@echo "  docker-push      - Push the Docker image to Docker Hub"
+	@echo "  release          - Create a GitHub release"
+	@echo "  open-issue       - Open a new issue on GitHub"
+	@echo "  create-pr        - Create a pull request"
+	@echo "  list-issues      - List open issues"
+	@echo "  list-prs         - List open pull requests"
+	@echo "  deploy-docs      - Deploy documentation to GitHub Pages"
+	@echo "  check-workflows  - Check GitHub Actions workflow status"
+	@echo "  generate-changelog - Generate a changelog"
 
 # Install Julia dependencies
 install:
@@ -103,5 +101,57 @@ release:
 	git push origin $$version; \
 	gh release create $$version --generate-notes
 	@echo "Release $$version created and pushed to GitHub."
+
+# Open a new issue on GitHub
+open-issue:
+	@echo "Opening a new issue on GitHub..."
+	@if [ -z "$(TITLE)" ] || [ -z "$(BODY)" ]; then \
+        	echo "Error: TITLE and BODY must be provided. Use 'make open-issue TITLE=\"<title>\" BODY=\"<body>\"'"; \
+       		exit 1; \
+    	fi
+	gh issue create --title "$(TITLE)" --body "$(BODY)"
+	@echo "Issue created successfully."
+
+# Create a pull request
+create-pr:
+	@echo "Creating a pull request..."
+	@if [ -z "$(BRANCH)" ] || [ -z "$(BASE)" ] || [ -z "$(TITLE)" ]; then \
+        	echo "Error: BRANCH, BASE, and TITLE must be provided. Use 'make create-pr BRANCH=<branch> BASE=<base> TITLE=\"<title>\"'"; \
+        	exit 1; \
+    	fi
+	gh pr create --base $(BASE) --head $(BRANCH) --title "$(TITLE)" --body "$(BODY)"
+	@echo "Pull request created successfully."
+
+# List open issues
+list-issues:
+	@echo "Listing open issues..."
+	gh issue list --state open
+
+# List open pull requests
+list-prs:
+	@echo "Listing open pull requests..."
+	gh pr list --state open
+
+# Deploy documentation to GitHub Pages
+deploy-docs:
+	@echo "Deploying documentation to GitHub Pages..."
+	gh repo set-default
+	gh pages deploy ./docs --cname your-custom-domain.com
+	@echo "Documentation deployed to GitHub Pages."
+
+# Check GitHub Actions workflow status
+check-workflows:
+	@echo "Checking GitHub Actions workflow status..."
+	gh run list --workflow=all
+
+# Generate a changelog
+generate-changelog:
+	@echo "Generating changelog..."
+	@if [ -z "$(FROM)" ] || [ -z "$(TO)" ]; then \
+        	echo "Error: FROM and TO must be provided. Use 'make generate-changelog FROM=<tag/commit> TO=<tag/commit>'"; \
+        	exit 1; \
+    	fi
+	gh api repos/$(OWNER)/$(REPO)/pulls --jq '.[] | select(.merged_at != null) | "- \(.title) (#\(.number))"' > CHANGELOG.md
+	@echo "Changelog generated in CHANGELOG.md."
 
 .PHONY: all help install run docker-build docker-run test clean
