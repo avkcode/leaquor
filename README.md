@@ -63,6 +63,14 @@ Run the Container
 ```bash
 docker run --rm -v $(pwd)/my_project:/app/my_project leaquor --dir /app/my_project
 ```
+
+Pull docker image
+```
+https://hub.docker.com/repository/docker/leaquor/leaquor/tags
+
+docker pull leaquor/leaquor:latest
+```
+
 ## Test
 Clones leaky repo and runs tests
 ```

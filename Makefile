@@ -10,6 +10,10 @@ PATTERNS_FILE = patterns.yaml
 TEST_REPO_URL = https://github.com/Plazmaz/leaky-repo.git
 TEST_REPO_DIR = leaky-repo
 
+DOCKER_HUB_USERNAME ?= leaquor
+DOCKER_HUB_REPO ?= $(DOCKER_HUB_USERNAME)/$(PROJECT_NAME)
+JULIA_VERSION ?= v1.11.5  # Default Julia version to install
+
 # Default target
 all: help
 
@@ -22,6 +26,7 @@ help:
 	@echo "  run            Run the script locally"
 	@echo "  docker-build   Build the Docker image"
 	@echo "  docker-run     Run the Docker container"
+	@echo "  docker-push    Push the Docker image to Docker Hub"
 	@echo "  test           Run tests using the test repository"
 	@echo "  clean          Remove temporary files and build artifacts"
 	@echo "  help           Display this help message"
@@ -48,6 +53,16 @@ docker-build:
 docker-run:
 	@echo "Running Docker container $(DOCKER_CONTAINER)..."
 	docker run --rm -v $(PWD):/app $(DOCKER_IMAGE) --help
+
+# Push the Docker image to Docker Hub
+docker-push: docker-build
+	@echo "Logging into Docker Hub..."
+	@docker login -u $(DOCKER_HUB_USERNAME)
+	@echo "Tagging image for Docker Hub..."
+	docker tag $(DOCKER_IMAGE) $(DOCKER_HUB_REPO):latest
+	@echo "Pushing image to Docker Hub..."
+	docker push $(DOCKER_HUB_REPO):latest
+	@echo "Image pushed successfully to $(DOCKER_HUB_REPO):latest"
 
 # Test target to validate the script
 test: docker-build clone-test-repo
