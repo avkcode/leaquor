@@ -27,7 +27,7 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
     - name: Build Docker image
-      run: make build
+      run: make docker-build
 
     - name: Run tests
       run: make test
