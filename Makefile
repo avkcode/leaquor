@@ -11,6 +11,9 @@ DOCKER_HUB_USERNAME ?= leaquor
 DOCKER_HUB_REPO ?= $(DOCKER_HUB_USERNAME)/$(PROJECT_NAME)
 JULIA_VERSION ?= v1.11.5  # Default Julia version to install
 
+GITHUB_REPO = avkcode/leaquor
+RELEASE_TAG ?= v1.0.0
+
 # Default target
 all: help
 
@@ -20,6 +23,8 @@ help:
 	@echo "  docker-build     - Build the Docker image"
 	@echo "  docker-run       - Run the Docker container"
 	@echo "  docker-push      - Push the Docker image to Docker Hub"
+	@echo "  docker-clean     - Clean up Docker artifacts (images, containers, volumes)"
+	@echo "  docker-clean-all - Force cleanup of all Docker images and artifacts"
 	@echo "  release          - Create a GitHub release"
 	@echo "  open-issue       - Open a new issue on GitHub"
 	@echo "  create-pr        - Create a pull request"
@@ -62,6 +67,21 @@ docker-push: docker-build
 	docker push $(DOCKER_HUB_REPO):latest
 	@echo "Image pushed successfully to $(DOCKER_HUB_REPO):latest"
 
+# Clean up Docker artifacts
+docker-clean:
+	@echo "Cleaning up Docker artifacts..."
+	-docker rm -f $$(docker ps -aq) || true
+	-docker rmi -f $$(docker images -q) || true
+	-docker volume prune -f || true
+	-docker network prune -f || true
+	@echo "Docker artifacts cleaned up."
+
+# Force cleanup of all Docker images and artifacts
+docker-clean-all:
+	@echo "Force cleaning up ALL Docker images and artifacts..."
+	-docker system prune -a -f --volumes
+	@echo "All Docker images and artifacts have been removed."
+
 # Test target to validate the script
 test: docker-build clone-test-repo
 	@echo "Running tests..."
@@ -101,6 +121,16 @@ release:
 	git push origin $$version; \
 	gh release create $$version --generate-notes
 	@echo "Release $$version created and pushed to GitHub."
+
+# Upload .deb package to GitHub release
+upload-release:
+	@if [ ! -f "leaquor.deb" ]; then \
+        	echo "Error: leaquor.deb not found. Please run 'make package' first."; \
+        	exit 1; \
+    	fi
+	@echo "Uploading leaquor.deb to GitHub release $(RELEASE_TAG)..."
+	gh release upload $(RELEASE_TAG) leaquor.deb --repo $(GITHUB_REPO)
+	@echo "Upload complete!"
 
 # Open a new issue on GitHub
 open-issue:
@@ -154,4 +184,9 @@ generate-changelog:
 	gh api repos/$(OWNER)/$(REPO)/pulls --jq '.[] | select(.merged_at != null) | "- \(.title) (#\(.number))"' > CHANGELOG.md
 	@echo "Changelog generated in CHANGELOG.md."
 
-.PHONY: all help install run docker-build docker-run test clean
+package:
+	@echo "Generating DEB packages..."
+	docker build -t $(DOCKER_IMAGE)-packager -f Dockerfile.package .
+	@echo "Packages generated: leaquor.deb"
+
+.PHONY: all help install run docker-build docker-run test clean package

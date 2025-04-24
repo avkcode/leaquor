@@ -1,0 +1,21 @@
+# Base image with Julia
+FROM julia:1.8 as builder
+
+# Install nfpm
+RUN echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | tee /etc/apt/sources.list.d/goreleaser.list
+RUN apt update
+RUN apt install nfpm
+
+# Copy the application files
+COPY leaquor.jl patterns.yaml nfpm.yaml /app/
+WORKDIR /app
+
+# Build stage for packaging
+FROM builder as packager
+
+# Generate DEB packages
+RUN nfpm pkg --config nfpm.yaml --target leaquor.deb
+
+# Final stage to output packages
+FROM scratch
+COPY --from=packager /app/leaquor.deb /leaquor.deb

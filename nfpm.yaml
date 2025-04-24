@@ -1,0 +1,17 @@
+name: leaquor
+arch: amd64
+platform: linux
+version: 1.0.0
+description: "Leaquor - A secrets scanner written in Julia"
+maintainer: "Anton Krylov - antonvkrylov@yandex.ru"
+license: "Apache 2.0"
+
+contents:
+  - src: ./leaquor.jl
+    dst: /usr/local/bin/leaquor.jl
+
+  - src: ./patterns.yaml 
+    dst: /usr/local/bin/patterns.yaml
+
+depends:
+  - julia
