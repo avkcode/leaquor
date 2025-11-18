@@ -9,15 +9,14 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy the Julia project definition first to maximize Docker layer caching
+COPY Project.toml /app/
+
+# Install required Julia packages for this project
+RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+
 # Copy all required project files into the container
 COPY leaquor.jl patterns.yaml /app/
-
-# Install required Julia packages
-RUN julia -e 'using Pkg; \
-    Pkg.add("Glob"); \
-    Pkg.add("JSON"); \
-    Pkg.add("YAML"); \
-    Pkg.add("LibGit2");'
 
 # Make the script executable
 RUN chmod +x /app/leaquor.jl
